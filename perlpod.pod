@@ -54,7 +54,7 @@ items consistent: either use "=item *" for all of them, to produce bullets,
 or use "=item 1.", "=item 2.", etc., to produce numbered lists, or use
 "=item foo", "=item bar", etc., i.e., things that looks nothing like bullets
 or numbers. If you start with bullets or numbers, stick with them, as many
-formatters use the first "=item" type to decide how to format the list.  
+formatters use the first "=item" type to decide how to format the list.
 
 For, begin, and end let you include sections that are not interpreted
 as pod text, but passed directly to particular formatters. A formatter
@@ -63,12 +63,12 @@ completely ignored.  The directive "=for" specifies that the entire next
 paragraph is in the format indicated by the first word after
 "=for", like this:
 
- =for html <br> 
+ =for html <br>
   <p> This is a raw HTML paragraph </p>
 
 The paired commands "=begin" and "=end" work very similarly to "=for", but
 instead of only accepting a single paragraph, all text from "=begin" to a
-paragraph with a matching "=end" are treated as a particular format. 
+paragraph with a matching "=end" are treated as a particular format.
 
 Here are some examples of how to use these:
 
@@ -95,7 +95,7 @@ treat some of these as synonyms.)
 
 And don't forget, when using any command, that the command lasts up until
 the end of the B<paragraph>, not the line. Hence in the examples below, you
-can see the blank lines after each command to end its paragraph.
+can see the empty lines after each command to end its paragraph.
 
 Some examples of lists include:
 
@@ -132,7 +132,7 @@ here and in commands:
     I<text>     italicize text, used for emphasis or variables
     B<text>     embolden text, used for switches and programs
     S<text>     text contains non-breaking spaces
-    C<code>	literal code 
+    C<code>	literal code
     L<name>     A link (cross reference) to name
 		    L<name>		manual page
 		    L<name/ident>	item in manual page
@@ -142,7 +142,7 @@ here and in commands:
 		    L</"sec">		ditto
     F<file>	Used for filenames
     X<index>	An index entry
-    ZE<lt>E<gt>	A zero-width character
+    Z<>		A zero-width character
     E<escape>   A named character (very similar to HTML escapes)
 		    E<lt>		A literal <
 		    E<gt>		A literal >
@@ -188,7 +188,7 @@ documentation with a "=head1" command at the beginning, and end it
 with a "=cut" command.  Perl will ignore the pod text.  See any of the
 supplied library modules for examples.  If you're going to put your
 pods at the end of the file, and you're using an __END__ or __DATA__
-cut mark, make sure to put a blank line there before the first pod
+cut mark, make sure to put an empty line there before the first pod
 directive.
 
     __END__
@@ -198,7 +198,7 @@ directive.
 
     modern - I am a modern module
 
-If you had not had that blank line there, then the translators wouldn't
+If you had not had that empty line there, then the translators wouldn't
 have seen it.
 
 =head1 Common Pod Pitfalls
@@ -208,7 +208,7 @@ have seen it.
 =item *
 
 Pod translators usually will require paragraphs to be separated by
-completely empty lines.  If you have an apparently blank line with
+completely empty lines.  If you have an apparently empty line with
 some spaces on it, this can cause odd formatting.
 
 =item *
@@ -222,7 +222,7 @@ sensibly.
 =item *
 
 The script F<pod/checkpods.PL> in the Perl source distribution
-provides skeletal checking for lines that look blank but aren't
+provides skeletal checking for lines that look empty but aren't
 B<only>, but is there as a placeholder until someone writes
 Pod::Checker.  The best way to check your pod is to pass it through
 one or more translators and proofread the result, or print out the

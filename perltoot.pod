@@ -89,7 +89,7 @@ the same name as the class as the constructor.
 =head2 Object Representation
 
 By far the most common mechanism used in Perl to represent a Pascal
-record, a C struct, or a C++ class an anonymous hash.  That's because a
+record, a C struct, or a C++ class is an anonymous hash.  That's because a
 hash has an arbitrary number of data fields, each conveniently accessed by
 an arbitrary name of your own devising.
 
@@ -267,8 +267,11 @@ Because while a constructor is explicitly called, a destructor is not.
 Destruction happens automatically via Perl's garbage collection (GC)
 system, which is a quick but somewhat lazy reference-based GC system.
 To know what to call, Perl insists that the destructor be named DESTROY.
+Perl's notion of the right time to call a destructor is not well-defined
+currently, which is why your destructors should not rely on when they are
+called.
 
-Why is DESTROY in all caps?  Perl on occasion uses purely upper-case
+Why is DESTROY in all caps?  Perl on occasion uses purely uppercase
 function names as a convention to indicate that the function will
 be automatically called by Perl in some way.  Others that are called
 implicitly include BEGIN, END, AUTOLOAD, plus all methods used by
@@ -311,7 +314,7 @@ be made through methods.
 
 Perl doesn't impose restrictions on who gets to use which methods.
 The public-versus-private distinction is by convention, not syntax.
-(Well, unless you use the Alias module described below in 
+(Well, unless you use the Alias module described below in
 L</"Data Members as Variables">.)  Occasionally you'll see method names beginning or ending
 with an underscore or two.  This marking is a convention indicating
 that the methods are private to that class alone and sometimes to its
@@ -350,7 +353,7 @@ Some might argue that one should go at these this way:
     }
 
 But since these methods are all executing in the class itself, this
-may not be critical.  There are trade-offs to be made.  Using direct
+may not be critical.  There are tradeoffs to be made.  Using direct
 hash access is faster (about an order of magnitude faster, in fact), and
 it's more convenient when you want to interpolate in strings.  But using
 methods (the external interface) internally shields not just the users of
@@ -796,7 +799,7 @@ base class.  If the original base class has been designed properly,
 then the new derived class can be used as a drop-in replacement for the
 old one.  This means you should be able to write a program like this:
 
-    use Employee
+    use Employee;
     my $empl = Employee->new();
     $empl->name("Jason");
     $empl->age(23);
@@ -886,7 +889,7 @@ This is a form of Laziness.  (Getting polymorphed is also what happens
 when the wizard decides you'd look better as a frog.)
 
 Every now and then you'll want to have a method call trigger both its
-derived class (also know as "subclass") version as well as its base class
+derived class (also known as "subclass") version as well as its base class
 (also known as "superclass") version.  In practice, constructors and
 destructors are likely to want to do this, and it probably also makes
 sense in the debug() method we showed previously.
@@ -1091,7 +1094,7 @@ In version 5.003, there were no predefined methods there, but you could put
 whatever you felt like into it.
 
 However, as of version 5.004 (or some subversive releases, like 5.003_08),
-UNIVERSAL has some methods in it already.  These are built-in to your Perl
+UNIVERSAL has some methods in it already.  These are builtin to your Perl
 binary, so they don't take any extra time to load.  Predefined methods
 include isa(), can(), and VERSION().  isa() tells you whether an object or
 class "is" another one without having to traverse the hierarchy yourself:
@@ -1112,7 +1115,7 @@ class) has a package global called $VERSION that's high enough, as in:
     $his_vers = $ob->VERSION();
 
 However, we don't usually call VERSION ourselves.  (Remember that an all
-upper-case function name is a Perl convention that indicates that the
+uppercase function name is a Perl convention that indicates that the
 function will be automatically used by Perl in some way.)  In this case,
 it happens when you say
 
@@ -1163,7 +1166,7 @@ instead of a hash reference to represent the object.
     sub new {
         my $self = [];
         $self->[$NAME]   = undef;  # this is unnecessary
-        $self->[$AGE]    = undef;  # as it this
+        $self->[$AGE]    = undef;  # as is this
         $self->[$PEERS]  = [];     # but this isn't, really
         bless($self);
         return $self;
@@ -1417,7 +1420,7 @@ is modify %fields.  No new functions need be written.
 
 I could have avoided the C<_permitted> field entirely, but I
 wanted to demonstrate how to store a reference to class data on the
-object so you wouldn't have to access that class data 
+object so you wouldn't have to access that class data
 directly from an object method.
 
 =head2 Inherited Autoloaded Data Methods
@@ -1467,12 +1470,12 @@ as detailed above.
 Perl programmers have responded to this by creating several different
 class construction classes.  These metaclasses are classes
 that create other classes.  A couple worth looking at are
-Class::Template and Alias.  These and other related metaclasses can be
+Class::Struct and Alias.  These and other related metaclasses can be
 found in the modules directory on CPAN.
 
-=head2 Class::Template
+=head2 Class::Struct
 
-One of the older ones is Class::Template.  In fact, its syntax and
+One of the older ones is Class::Struct.  In fact, its syntax and
 interface were sketched out long before perl5 even solidified into a
 real thing.  What it does is provide you a way to "declare" a class
 as having objects whose fields are of a specific type.  The function
@@ -1481,11 +1484,11 @@ structures or records are not base types in Perl, each time you want to
 create a class to provide a record-like data object, you yourself have
 to define a new() method, plus separate data-access methods for each of
 that record's fields.  You'll quickly become bored with this process.
-The Class::Template::struct() function alleviates this tedium.
+The Class::Struct::struct() function alleviates this tedium.
 
 Here's a simple example of using it:
 
-    use Class::Template qw(struct);
+    use Class::Struct qw(struct);
     use Jobbie;  # user-defined; see below
 
     struct 'Fred' => {
@@ -1520,7 +1523,7 @@ act like structs in the C sense.
     printf "perl.com's real name is %s, address %s\n",
 	$h->name, inet_ntoa($h->addr);
 
-Here's how to do this using the Class::Template module.
+Here's how to do this using the Class::Struct module.
 The crux is going to be this call:
 
     struct 'Net::hostent' => [  	# note bracket
@@ -1544,7 +1547,7 @@ We could also have implemented our object this way:
 	addr_list  => '@',
      };
 
-and then Class::Template would have used an anonymous hash as the object
+and then Class::Struct would have used an anonymous hash as the object
 type, instead of an anonymous array.  The array is faster and smaller,
 but the hash works out better if you eventually want to do inheritance.
 Since for this struct-like object we aren't planning on inheritance,
@@ -1557,8 +1560,7 @@ Here's the whole implementation:
 
     BEGIN {
 	use Exporter   ();
-	use vars       qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-	@ISA         = qw(Exporter);
+	use vars       qw(@EXPORT @EXPORT_OK %EXPORT_TAGS);
 	@EXPORT      = qw(gethostbyname gethostbyaddr gethost);
 	@EXPORT_OK   = qw(
 			   $h_name         @h_aliases
@@ -1569,7 +1571,10 @@ Here's the whole implementation:
     }
     use vars      @EXPORT_OK;
 
-    use Class::Template qw(struct);
+    # Class::Struct forbids use of @ISA
+    sub import { goto &Exporter::import }
+
+    use Class::Struct qw(struct);
     struct 'Net::hostent' => [
        name        => '$',
        aliases     => '@',
@@ -1582,7 +1587,7 @@ Here's the whole implementation:
 
     sub populate (@) {
 	return unless @_;
-	my $hob = new();  # Class::Template made this!
+	my $hob = new();  # Class::Struct made this!
 	$h_name     =    $hob->[0]              = $_[0];
 	@h_aliases  = @{ $hob->[1] } = split ' ', $_[1];
 	$h_addrtype =    $hob->[2]              = $_[2];
@@ -1615,16 +1620,17 @@ Here's the whole implementation:
 
 We've snuck in quite a fair bit of other concepts besides just dynamic
 class creation, like overriding core functions, import/export bits,
-function prototyping, and short-cut function call via C<&whatever>.
-These all mostly make sense from the perspective of a traditional module,
-but as you can see, we can also use them in an object module.
+function prototyping, short-cut function call via C<&whatever>, and
+function replacement with C<goto &whatever>.  These all mostly make
+sense from the perspective of a traditional module, but as you can see,
+we can also use them in an object module.
 
 You can look at other object-based, struct-like overrides of core
 functions in the 5.004 release of Perl in File::stat, Net::hostent,
 Net::netent, Net::protoent, Net::servent, Time::gmtime, Time::localtime,
 User::grent, and User::pwent.  These modules have a final component
-that's all lower-case, by convention reserved for compiler pragmas,
-because they affect the compilation and change a built-in function.
+that's all lowercase, by convention reserved for compiler pragmas,
+because they affect the compilation and change a builtin function.
 They also have the type names that a C programmer would most expect.
 
 =head2 Data Members as Variables
@@ -1688,14 +1694,14 @@ update value fields in the hash.  Convenient, eh?
 
 The need for the C<use vars> declaration is because what Alias does
 is play with package globals with the same name as the fields.  To use
-globals while C<use strict> is in effect, you have to pre-declare them.
+globals while C<use strict> is in effect, you have to predeclare them.
 These package variables are localized to the block enclosing the attr()
 call just as if you'd used a local() on them.  However, that means that
 they're still considered global variables with temporary values, just
 as with any other local().
 
 It would be nice to combine Alias with
-something like Class::Template or Class::MethodMaker.
+something like Class::Struct or Class::MethodMaker.
 
 =head2 NOTES
 
@@ -1726,7 +1732,7 @@ object (one expecting a reference), or vice versa.
 
 Z<>From the C++ perspective, all methods in Perl are virtual.
 This, by the way, is why they are never checked for function
-prototypes in the argument list as regular built-in and user-defined
+prototypes in the argument list as regular builtin and user-defined
 functions can be.
 
 Because a class is itself something of an object, Perl's classes can be
@@ -1737,7 +1743,7 @@ notion, but not the former.
 
 =head1 SEE ALSO
 
-The following man pages will doubtless provide more
+The following manpages will doubtless provide more
 background for this one:
 L<perlmod>,
 L<perlref>,
@@ -1755,7 +1761,7 @@ experiences have mandated its inclusion:
     Copyright 1996 Tom Christiansen.  All Rights Reserved.
 
 This work derives in part from the second edition of I<Programming Perl>.
-Although destined for release as a man page with the standard Perl
+Although destined for release as a manpage with the standard Perl
 distribution, it is not public domain (nor is any of Perl and its docset:
 publishers beware).  It's expected to someday make its way into a revision
 of the Camel Book.  While it is copyright by me with all rights reserved,

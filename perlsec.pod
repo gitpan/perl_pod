@@ -6,10 +6,10 @@ perlsec - Perl security
 
 Perl is designed to make it easy to program securely even when running
 with extra privileges, like setuid or setgid programs.  Unlike most
-command-line shells, which are based on multiple substitution passes on
+command line shells, which are based on multiple substitution passes on
 each line of the script, Perl uses a more conventional evaluation scheme
 with fewer hidden snags.  Additionally, because the language has more
-built-in functionality, it can rely less upon external (and possibly
+builtin functionality, it can rely less upon external (and possibly
 untrustworthy) programs to accomplish its purposes.
 
 Perl automatically enables a set of special security checks, called I<taint
@@ -29,7 +29,7 @@ and it is these checks especially that contribute to making a setuid Perl
 program more secure than the corresponding C program.
 
 You may not use data derived from outside your program to affect something
-else outside your program--at least, not by accident.  All command-line
+else outside your program--at least, not by accident.  All command line
 arguments, environment variables, locale information (see L<perllocale>),
 and file input are marked as "tainted".  Tainted data may not be used
 directly or indirectly in any command that invokes a sub-shell, nor in any
@@ -57,8 +57,8 @@ For example:
 
     $path = $ENV{'PATH'};	# $path now tainted
 
-    $ENV{'PATH'} = '/bin:/usr/bin'; 
-    $ENV{'IFS'} = '' if $ENV{'IFS'} ne '';
+    $ENV{'PATH'} = '/bin:/usr/bin';
+    delete @ENV{'IFS', 'CDPATH', 'ENV', 'BASH_ENV'};
 
     $path = $ENV{'PATH'};	# $path now NOT tainted
     system "echo $data";	# Is secure now!
@@ -79,10 +79,13 @@ For example:
     exec "echo", $arg;		# Secure (doesn't use the shell)
     exec "sh", '-c', $arg;	# Considered secure, alas!
 
+    @files = <*.c>;		# Always insecure (uses csh)
+    @files = glob('*.c');	# Always insecure (uses csh)
+
 If you try to do something insecure, you will get a fatal error saying
 something like "Insecure dependency" or "Insecure PATH".  Note that you
 can still write an insecure B<system> or B<exec>, but only by explicitly
-doing something like the last example above.  
+doing something like the last example above.
 
 =head2 Laundering and Detecting Tainted Data
 
@@ -91,9 +94,9 @@ trigger an "Insecure dependency" message, you can use the following
 I<is_tainted()> function.
 
     sub is_tainted {
-	return ! eval { 
-	    join('',@_), kill 0; 
-	    1; 	
+	return ! eval {
+	    join('',@_), kill 0;
+	    1;
 	};
     }
 
@@ -106,7 +109,7 @@ same expression, the whole expression is considered tainted.
 
 But testing for taintedness gets you only so far.  Sometimes you have just
 to clear your data's taintedness.  The only way to bypass the tainting
-mechanism is by referencing sub-patterns from a regular expression match.
+mechanism is by referencing subpatterns from a regular expression match.
 Perl presumes that if you reference a substring using $1, $2, etc., that
 you knew what you were doing when you wrote the pattern.  That means using
 a bit of thought--don't just blindly untaint anything, or you defeat the
@@ -119,7 +122,7 @@ Here's a test to make sure that the data contains nothing but "word"
 characters (alphabetics, numerics, and underscores), a hyphen, an at sign,
 or a dot.
 
-    if ($data =~ /^([-\@\w.]+)$/) { 	
+    if ($data =~ /^([-\@\w.]+)$/) {
 	$data = $1; 			# $data now untainted
     } else {
 	die "Bad data in $data"; 	# log this somewhere
@@ -146,12 +149,12 @@ block.  See L<perllocale/SECURITY> for further discussion and examples.
 
 When you make a script executable, in order to make it usable as a
 command, the system will pass switches to perl from the script's #!
-line.  Perl checks that any command-line switches given to a setuid
+line.  Perl checks that any command line switches given to a setuid
 (or setgid) script actually match the ones set on the #! line.  Some
-UNIX and UNIX-like environments impose a one-switch limit on the #!
+Unix and Unix-like environments impose a one-switch limit on the #!
 line, so you may need to use something like C<-wU> instead of C<-w -U>
-under such systems.  (This issue should arise only in UNIX or
-UNIX-like environments that support #! and setuid or setgid scripts.)
+under such systems.  (This issue should arise only in Unix or
+Unix-like environments that support #! and setuid or setgid scripts.)
 
 =head2 Cleaning Up Your Path
 
@@ -164,7 +167,7 @@ it's generated because you never set your PATH environment variable, or
 you didn't set it to something that was safe.  Because Perl can't
 guarantee that the executable in question isn't itself going to turn
 around and execute some other program that is dependent on your PATH, it
-makes sure you set the PATH.  
+makes sure you set the PATH.
 
 It's also possible to get into trouble with other operations that don't
 care whether they use tainted values.  Make judicious use of the file
@@ -177,8 +180,8 @@ prevent stupid mistakes, not to remove the need for thought.
 Perl does not call the shell to expand wild cards when you pass B<system>
 and B<exec> explicit parameter lists instead of strings with possible shell
 wildcards in them.  Unfortunately, the B<open>, B<glob>, and
-back-tick functions provide no such alternate calling convention, so more
-subterfuge will be required.  
+backtick functions provide no such alternate calling convention, so more
+subterfuge will be required.
 
 Perl provides a reasonably safe way to open a file or pipe from a setuid
 or setgid program: just create a child process with reduced privilege who
@@ -193,13 +196,13 @@ parent.  Because the file or pipe was opened in the child while running
 under less privilege than the parent, it's not apt to be tricked into
 doing something it shouldn't.
 
-Here's a way to do back-ticks reasonably safely.  Notice how the B<exec> is
+Here's a way to do backticks reasonably safely.  Notice how the B<exec> is
 not called with a string that the shell could expand.  This is by far the
 best way to call something that might be subjected to shell escapes: just
 never call the shell at all.  By the time we get to the B<exec>, tainting
 is turned off, however, so be careful what you call and what you pass it.
 
-    use English;  
+    use English;
     die unless defined $pid = open(KID, "-|");
     if ($pid) {	          # parent
 	while (<KID>) {
@@ -247,7 +250,7 @@ Alternately, it can simply ignore the setuid bit on scripts.  If the
 latter is true, Perl can emulate the setuid and setgid mechanism when it
 notices the otherwise useless setuid/gid bits on Perl scripts.  It does
 this via a special executable called B<suidperl> that is automatically
-invoked for you if it's needed.  
+invoked for you if it's needed.
 
 However, if the kernel setuid script feature isn't disabled, Perl will
 complain loudly that your setuid script is insecure.  You'll need to
@@ -258,14 +261,14 @@ kernel bug that plagues setuid scripts.  Here's a simple wrapper, written
 in C:
 
     #define REAL_PATH "/path/to/script"
-    main(ac, av) 
+    main(ac, av)
 	char **av;
     {
 	execv(REAL_PATH, av);
-    } 
+    }
 
-Compile this wrapper into a binary executable and then make I<it> rather 
-than your script setuid or setgid.  
+Compile this wrapper into a binary executable and then make I<it> rather
+than your script setuid or setgid.
 
 See the program B<wrapsuid> in the F<eg> directory of your Perl
 distribution for a convenient way to do this automatically for all your
@@ -287,3 +290,38 @@ SysVr4 and BSD 4.4 use this approach to avoid the kernel race condition.
 Prior to release 5.003 of Perl, a bug in the code of B<suidperl> could
 introduce a security hole in systems compiled with strict POSIX
 compliance.
+
+=head2 Protecting Your Programs
+
+There are a number of ways to hide the source to your Perl programs,
+with varying levels of "security".
+
+First of all, however, you I<can't> take away read permission, because
+the source code has to be readable in order to be compiled and
+interpreted.  (That doesn't mean that a CGI script's source is
+readable by people on the web, though.)  So you have to leave the
+permissions at the socially friendly 0755 level.
+
+Some people regard this as a security problem.  If your program does
+insecure things, and relies on people not knowing how to exploit those
+insecurities, it is not secure.  It is often possible for someone to
+determine the insecure things and exploit them without viewing the
+source.  Security through obscurity, the name for hiding your bugs
+instead of fixing them, is little security indeed.
+
+You can try using encryption via source filters (Filter::* from CPAN).
+But crackers might be able to decrypt it.  You can try using the
+byte code compiler and interpreter described below, but crackers might
+be able to de-compile it.  You can try using the native-code compiler
+described below, but crackers might be able to disassemble it.  These
+pose varying degrees of difficulty to people wanting to get at your
+code, but none can definitively conceal it (this is true of every
+language, not just Perl).
+
+If you're concerned about people profiting from your code, then the
+bottom line is that nothing but a restrictive licence will give you
+legal security.  License your software and pepper it with threatening
+statements like "This is unpublished proprietary software of XYZ Corp.
+Your access to it does not give you permission to use it blah blah
+blah."  You should see a lawyer to be sure your licence's wording will
+stand up in court.

@@ -664,6 +664,12 @@ Possible locations to get this from are
   ftp://ftp.cdrom.com/pub/os2/dev32/
   ftp://ftp.cdrom.com/pub/os2/emx09c/
 
+It is reported that the following archives contain enough utils to
+build perl: gnufutil.zip, gnusutil.zip, gnututil.zip, gnused.zip,
+gnupatch.zip, gnuawk.zip, gnumake.zip and ksh527rt.zip.  Note that
+all these utilities are known to be available from LEO:
+
+  ftp://ftp.leo.org/pub/comp/os/os2/leo/gnu
 
 Make sure that no copies or perl are currently running.  Later steps
 of the build may fail since an older version of perl.dll loaded into
@@ -1076,8 +1082,13 @@ eventually).
 
 =item
 
-Since L<flock(3)> is present in EMX, but is not functional, the same is
-true for perl. Here is the list of things which may be "broken" on
+Since L<flock(3)> is present in EMX, but is not functional, it is 
+emulated by perl.  To disable the emulations, set environment variable
+C<USE_PERL_FLOCK=0>.
+
+=item
+
+Here is the list of things which may be "broken" on
 EMX (from EMX docs):
 
 =over
@@ -1093,7 +1104,7 @@ L<sock_init(3)> is not required and not implemented.
 
 =item *
 
-L<flock(3)> is not yet implemented (dummy function).
+L<flock(3)> is not yet implemented (dummy function).  (Perl has a workaround.)
 
 =item *
 
@@ -1148,6 +1159,12 @@ a dummy implementation.
 =item C<stat>
 
 C<os2_stat> special-cases F</dev/tty> and F</dev/con>.
+
+=item C<flock>
+
+Since L<flock(3)> is present in EMX, but is not functional, it is 
+emulated by perl.  To disable the emulations, set environment variable
+C<USE_PERL_FLOCK=0>.
 
 =back
 
@@ -1306,7 +1323,11 @@ substituted with F<path2>.
 
 Should be used if the perl library is moved from the default
 location in preference to C<PERL(5)LIB>, since this would not leave wrong
-entries in <@INC>. 
+entries in @INC.  Say, if the compiled version of perl looks for @INC
+in F<f:/perllib/lib>, and you want to install the library in
+F<h:/opt/gnu>, do
+
+  set PERLLIB_PREFIX=f:/perllib/lib;h:/opt/gnu
 
 =head2 C<PERL_BADLANG>
 
@@ -1323,6 +1344,12 @@ memory handling code is buggy.
 
 Specific for EMX port. Gives the directory part of the location for
 F<sh.exe>.
+
+=head2 C<USE_PERL_FLOCK>
+
+Specific for EMX port. Since L<flock(3)> is present in EMX, but is not 
+functional, it is emulated by perl.  To disable the emulations, set 
+environment variable C<USE_PERL_FLOCK=0>.
 
 =head2 C<TMP> or C<TEMP>
 
