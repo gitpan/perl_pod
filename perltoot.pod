@@ -65,7 +65,7 @@ For example, let's make a simple Person class module.  It gets stored in
 the file Person.pm.  If it were called a Happy::Person class, it would
 be stored in the file Happy/Person.pm, and its package would become
 Happy::Person instead of just Person.  (On a personal computer not
-running Unix or Plan 9, but something like MacOS or VMS, the directory
+running Unix or Plan 9, but something like Mac OS or VMS, the directory
 separator may be different, but the principle is the same.)  Do not assume
 any formal relationship between modules based on their directory names.
 This is merely a grouping convenience, and has no effect on inheritance,
@@ -111,8 +111,8 @@ by up-casing the hash keys:
         PEERS => [ "Norbert", "Rhys", "Phineas"],
     };
 
-And so you could get at C<$rec-E<gt>{NAME}> to find "Jason", or
-C<@{ $rec-E<gt>{PEERS} }> to get at "Norbert", "Rhys", and "Phineas".
+And so you could get at C<< $rec->{NAME} >> to find "Jason", or
+C<< @{ $rec->{PEERS} } >> to get at "Norbert", "Rhys", and "Phineas".
 (Have you ever noticed how many 23-year-old programmers seem to
 be named "Jason" these days? :-)
 
@@ -329,7 +329,7 @@ do more than fetch or set one particular field.
     sub exclaim {
         my $self = shift;
         return sprintf "Hi, I'm %s, age %d, working with %s",
-            $self->{NAME}, $self->{AGE}, join(", ", $self->{PEERS});
+            $self->{NAME}, $self->{AGE}, join(", ", @{$self->{PEERS}});
     }
 
 Or maybe even one like this:
@@ -424,6 +424,10 @@ this could be done:
 
 Notice how there's no memory to deallocate in the destructor?  That's
 something that Perl takes care of for you all by itself.
+
+Alternatively, you could use the Class::Data::Inheritable module from
+CPAN.
+
 
 =head2 Accessing Class Data
 
@@ -542,7 +546,7 @@ and DESTROY methods as follows:
     }
 
 What happens if a derived class (which we'll call Employee) inherits
-methods from this Person base class?  Then C<Employee-E<gt>debug()>, when called
+methods from this Person base class?  Then C<< Employee->debug() >>, when called
 as a class method, manipulates $Person::Debugging not $Employee::Debugging.
 
 =head2 Class Destructors
@@ -749,7 +753,7 @@ Finally, here's the test program:
     $him->fullname->title("St");
     $him->age(1);
 
-    printf "%s is really %s.\n", $him->name, $him->fullname;
+    printf "%s is really %s.\n", $him->name, $him->fullname->as_string;
     printf "%s's age: %d.\n", $him->name, $him->age;
     $him->happy_birthday;
     printf "%s's age: %d.\n", $him->name, $him->age;
@@ -816,7 +820,7 @@ What do we mean by the Person::new() function -- isn't that actually
 a method?  Well, in principle, yes.  A method is just a function that
 expects as its first argument a class name (package) or object
 (blessed reference).   Person::new() is the function that both the
-C<Person-E<gt>new()> method and the C<Employee-E<gt>new()> method end
+C<< Person->new() >> method and the C<< Employee->new() >> method end
 up calling.  Understand that while a method call looks a lot like a
 function call, they aren't really quite the same, and if you treat them
 as the same, you'll very soon be left with nothing but broken programs.
@@ -965,7 +969,7 @@ And here's the test program:
     $boss->age(47);
     $boss->peers("Frank", "Felipe", "Faust");
 
-    printf "%s is age %d.\n", $boss->fullname, $boss->age;
+    printf "%s is age %d.\n", $boss->fullname->as_string, $boss->age;
     printf "His peers are: %s\n", join(", ", $boss->peers);
 
 Running it, we see that we're still ok.  If you'd like to dump out your
@@ -1124,8 +1128,7 @@ it happens when you say
 If you wanted to add version checking to your Person class explained
 above, just add this to Person.pm:
 
-    use vars qw($VERSION);
-    $VERSION = '1.1';
+    our $VERSION = '1.1';
 
 and then in Employee.pm could you can say
 
@@ -1363,7 +1366,7 @@ constructor will look like when taking this approach:
 
     package Person;
     use Carp;
-    use vars qw($AUTOLOAD);  # it's a package global
+    our $AUTOLOAD;  # it's a package global
 
     my %fields = (
 	name        => undef,
@@ -1433,8 +1436,7 @@ Here's how to be careful:
     package Employee;
     use Person;
     use strict;
-    use vars qw(@ISA);
-    @ISA = qw(Person);
+    our @ISA = qw(Person);
 
     my %fields = (
 	id          => undef,
@@ -1560,16 +1562,15 @@ Here's the whole implementation:
 
     BEGIN {
 	use Exporter   ();
-	use vars       qw(@EXPORT @EXPORT_OK %EXPORT_TAGS);
-	@EXPORT      = qw(gethostbyname gethostbyaddr gethost);
-	@EXPORT_OK   = qw(
-			   $h_name         @h_aliases
-			   $h_addrtype     $h_length
-			   @h_addr_list    $h_addr
-		       );
-	%EXPORT_TAGS = ( FIELDS => [ @EXPORT_OK, @EXPORT ] );
+	our @EXPORT      = qw(gethostbyname gethostbyaddr gethost);
+	our @EXPORT_OK   = qw(
+			       $h_name         @h_aliases
+			       $h_addrtype     $h_length
+			       @h_addr_list    $h_addr
+			   );
+	our %EXPORT_TAGS = ( FIELDS => [ @EXPORT_OK, @EXPORT ] );
     }
-    use vars      @EXPORT_OK;
+    our @EXPORT_OK;
 
     # Class::Struct forbids use of @ISA
     sub import { goto &Exporter::import }
@@ -1661,7 +1662,7 @@ update value fields in the hash.  Convenient, eh?
     }
 
     use Alias qw(attr);
-    use vars qw($NAME $AGE $PEERS);
+    our ($NAME, $AGE, $PEERS);
 
     sub name {
 	my $self = attr shift;
@@ -1692,7 +1693,7 @@ update value fields in the hash.  Convenient, eh?
         return ++$AGE;
     }
 
-The need for the C<use vars> declaration is because what Alias does
+The need for the C<our> declaration is because what Alias does
 is play with package globals with the same name as the fields.  To use
 globals while C<use strict> is in effect, you have to predeclare them.
 These package variables are localized to the block enclosing the attr()
@@ -1703,7 +1704,7 @@ as with any other local().
 It would be nice to combine Alias with
 something like Class::Struct or Class::MethodMaker.
 
-=head2 NOTES
+=head1 NOTES
 
 =head2 Object Terminology
 
@@ -1730,7 +1731,7 @@ as a class or object method is by usage only.  You could accidentally
 call a class method (one expecting a string argument) on an
 object (one expecting a reference), or vice versa.
 
-Z<>From the C++ perspective, all methods in Perl are virtual.
+From the C++ perspective, all methods in Perl are virtual.
 This, by the way, is why they are never checked for function
 prototypes in the argument list as regular builtin and user-defined
 functions can be.
@@ -1753,17 +1754,23 @@ L<perltie>,
 and
 L<overload>.
 
+L<perlboot> is a kinder, gentler introduction to object-oriented
+programming.
+
+L<perltooc> provides more detail on class data.
+
+Some modules which might prove interesting are Class::Accessor,
+Class::Class, Class::Contract, Class::Data::Inheritable,
+Class::MethodMaker and Tie::SecureHash
+
+
 =head1 AUTHOR AND COPYRIGHT
 
 Copyright (c) 1997, 1998 Tom Christiansen 
 All rights reserved.
 
-When included as part of the Standard Version of Perl, or as part of
-its complete documentation whether printed or otherwise, this work
-may be distributed only under the terms of Perl's Artistic License.
-Any distribution of this file or derivatives thereof I<outside>
-of that package require that special arrangements be made with
-copyright holder.
+This documentation is free; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 Irrespective of its distribution, all code examples in this file
 are hereby placed into the public domain.  You are permitted and
