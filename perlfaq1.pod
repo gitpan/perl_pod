@@ -1,6 +1,6 @@
 =head1 NAME
 
-perlfaq1 - General Questions About Perl ($Revision: 1.12 $, $Date: 1997/04/24 22:43:34 $)
+perlfaq1 - General Questions About Perl ($Revision: 1.15 $, $Date: 1998/08/05 11:52:24 $)
 
 =head1 DESCRIPTION
 
@@ -29,13 +29,14 @@ distribution policy of perl.  Perl is supported by its users.  The
 core, the standard Perl library, the optional modules, and the
 documentation you're reading now were all written by volunteers.  See
 the personal note at the end of the README file in the perl source
-distribution for more details.
+distribution for more details.  See L<perlhist> (new as of 5.005)
+for Perl's milestone releases.
 
 In particular, the core development team (known as the Perl
 Porters) are a rag-tag band of highly altruistic individuals
 committed to producing better software for free than you
 could hope to purchase for money.  You may snoop on pending
-developments via news://genetics.upenn.edu/perl.porters-gw/ and
+developments via news://news.perl.com/perl.porters-gw/ and
 http://www.frii.com/~gnat/perl/porters/summary.html.
 
 While the GNU project includes Perl in its distributions, there's no
@@ -51,10 +52,10 @@ users the informal support will more than suffice.  See the answer to
 
 You should definitely use version 5.  Version 4 is old, limited, and
 no longer maintained; its last patch (4.036) was in 1992.  The most
-recent production release is 5.004.  Further references to the Perl
+recent production release is 5.005_01.  Further references to the Perl
 language in this document refer to this production release unless
 otherwise specified.  There may be one or more official bug fixes for
-5.004 by the time you read this, and also perhaps some experimental
+5.005_01 by the time you read this, and also perhaps some experimental
 versions on the way to the next release.
 
 =head2 What are perl4 and perl5?
@@ -77,6 +78,8 @@ To avoid the "what language is perl5?" confusion, some people prefer to
 simply use "perl" to refer to the latest version of perl and avoid using
 "perl5" altogether.  It's not really that big a deal, though.
 
+See L<perlhist> for a history of Perl revisions.
+
 =head2 How stable is Perl?
 
 Production releases, which incorporate bug fixes and new functionality,
@@ -92,10 +95,10 @@ and the rare new keyword).
 
 =head2 Is Perl difficult to learn?
 
-Perl is easy to start learning -- and easy to keep learning.  It looks
-like most programming languages you're likely to have had experience
+No, Perl is easy to start learning -- and easy to keep learning.  It looks
+like most programming languages you're likely to have experience
 with, so if you've ever written an C program, an awk script, a shell
-script, or even an Excel macro, you're already part way there.
+script, or even BASIC program, you're already part way there.
 
 Most tasks only require a small subset of the Perl language.  One of
 the guiding mottos for Perl development is "there's more than one way
@@ -208,7 +211,7 @@ available from http://www.perl.com/CPAN/misc/japh .
 Over a hundred quips by Larry, from postings of his or source code,
 can be found at http://www.perl.com/CPAN/misc/lwall-quotes .
 
-=head2 How can I convince my sysadmin/supervisor/employees to use version (5/5.004/Perl instead of some other language)?
+=head2 How can I convince my sysadmin/supervisor/employees to use version (5/5.005/Perl instead of some other language)?
 
 If your manager or employees are wary of unsupported software, or
 software which doesn't officially ship with your Operating System, you
@@ -220,7 +223,7 @@ sometimes helpful to point out that delivery times may be reduced
 using Perl, as compared to other languages.
 
 If you have a project which has a bottleneck, especially in terms of
-translation, or testing, Perl almost certainly will provide a viable,
+translation or testing, Perl almost certainly will provide a viable,
 and quick solution.  In conjunction with any persuasion effort, you
 should not fail to point out that Perl is used, quite extensively, and
 with extremely reliable and valuable results, at many large computer
@@ -238,12 +241,28 @@ for any given task.  Also mention that the difference between version
 (Well, ok, maybe not quite that distinct, but you get the idea.)  If
 you want support and a reasonable guarantee that what you're
 developing will continue to work in the future, then you have to run
-the supported version.  That probably means running the 5.004 release,
-although 5.003 isn't that bad (it's just one year and one release
+the supported version.  That probably means running the 5.005 release,
+although 5.004 isn't that bad (it's just one year and one release
 behind).  Several important bugs were fixed from the 5.000 through
-5.002 versions, though, so try upgrading past them if possible.
+5.003 versions, though, so try upgrading past them if possible.
+
+Of particular note is the massive bughunt for buffer overflow
+problems that went into the 5.004 release.  All releases prior to
+that, including perl4, are considered insecure and should be upgraded
+as soon as possible. 
 
 =head1 AUTHOR AND COPYRIGHT
 
-Copyright (c) 1997 Tom Christiansen and Nathan Torkington.
-All rights reserved.  See L<perlfaq> for distribution information.
+Copyright (c) 1997, 1998 Tom Christiansen and Nathan Torkington.
+All rights reserved.
+
+When included as an integrated part of the Standard Distribution
+of Perl or of its documentation (printed or otherwise), this works is
+covered under Perl's Artistic Licence.  For separate distributions of
+all or part of this FAQ outside of that, see L<perlfaq>.
+
+Irrespective of its distribution, all code examples here are public
+domain.  You are permitted and encouraged to use this code and any
+derivatives thereof in your own programs for fun or for profit as you
+see fit.  A simple comment in the code giving credit to the FAQ would
+be courteous but is not required.
