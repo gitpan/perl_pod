@@ -29,8 +29,8 @@ Output record formats are declared as follows:
     FORMLIST
     .
 
-If name is omitted, format "STDOUT" is defined.  FORMLIST consists of a
-sequence of lines, each of which may be of one of three types:
+If name is omitted, format "STDOUT" is defined.  FORMLIST consists of
+a sequence of lines, each of which may be of one of three types:
 
 =over 4
 
@@ -54,7 +54,7 @@ with either "@" (at) or "^" (caret).  These lines do not undergo any kind
 of variable interpolation.  The at field (not to be confused with the array
 marker @) is the normal kind of field; the other kind, caret fields, are used
 to do rudimentary multi-line text block filling.  The length of the field
-is supplied by padding out the field with multiple "<", ">", or "|"
+is supplied by padding out the field with multiple "E<lt>", "E<gt>", or "|"
 characters to specify, respectively, left justification, right
 justification, or centering.  If the variable would exceed the width
 specified, it is truncated.
@@ -72,7 +72,14 @@ separated by commas.  The expressions are all evaluated in a list context
 before the line is processed, so a single list expression could produce
 multiple list elements.  The expressions may be spread out to more than
 one line if enclosed in braces.  If so, the opening brace must be the first
-token on the first line.
+token on the first line.  If an expression evaluates to a number with a
+decimal part, and if the corresponding picture specifies that the decimal
+part should appear in the output (that is, any picture except multiple "#"
+characters B<without> an embedded "."), the character used for the decimal
+point is B<always> determined by the current LC_NUMERIC locale.  This
+means that, if, for example, the run-time environment happens to specify a
+German locale, "," will be used instead of the default ".".  See
+L<perllocale> and L<"WARNINGS"> for more information.
 
 Picture fields that begin with ^ rather than @ are treated specially.
 With a # field, the field is blanked out if the value is undefined.  For
@@ -147,18 +154,18 @@ Examples:
  .
 
 It is possible to intermix print()s with write()s on the same output
-channel, but you'll have to handle $- ($FORMAT_LINES_LEFT)
+channel, but you'll have to handle C<$-> (C<$FORMAT_LINES_LEFT>)
 yourself.
 
 =head2 Format Variables
 
-The current format name is stored in the variable C<$~> ($FORMAT_NAME),
-and the current top of form format name is in C<$^> ($FORMAT_TOP_NAME).
-The current output page number is stored in C<$%> ($FORMAT_PAGE_NUMBER),
-and the number of lines on the page is in C<$=> ($FORMAT_LINES_PER_PAGE).
+The current format name is stored in the variable C<$~> (C<$FORMAT_NAME>),
+and the current top of form format name is in C<$^> (C<$FORMAT_TOP_NAME>).
+The current output page number is stored in C<$%> (C<$FORMAT_PAGE_NUMBER>),
+and the number of lines on the page is in C<$=> (C<$FORMAT_LINES_PER_PAGE>).
 Whether to autoflush output on this handle is stored in C<$|>
-($OUTPUT_AUTOFLUSH).  The string output before each top of page (except
-the first) is stored in C<$^L> ($FORMAT_FORMFEED).  These variables are
+(C<$OUTPUT_AUTOFLUSH>).  The string output before each top of page (except
+the first) is stored in C<$^L> (C<$FORMAT_FORMFEED>).  These variables are
 set on a per-filehandle basis, so you'll need to select() into a different
 one to affect them:
 
@@ -198,7 +205,7 @@ Much better!
 
 =head1 NOTES
 
-Since the values line may contain arbitrary expressions (for at fields, 
+Because the values line may contain arbitrary expressions (for at fields, 
 not caret fields), you can farm out more sophisticated processing
 to other functions, like sprintf() or one of your own.  For example:
 
@@ -306,10 +313,25 @@ is to printf(), do this:
  END
     print $string;
 
-=head1 WARNING
+=head1 WARNINGS
+
+The lone dot that ends a format can also prematurely end an E-Mail
+message passing through a misconfigured Internet mailer (and based on
+experience, such misconfiguration is the rule, not the exception).  So
+when sending format code through E-Mail, you should indent it so that
+the format-ending dot is not on the left margin; this will prevent
+E-Mail cutoff.
 
 Lexical variables (declared with "my") are not visible within a
 format unless the format is declared within the scope of the lexical
-variable.  (They weren't visible at all before version 5.001.)  Furthermore,
-lexical aliases will not be compiled correctly: see
-L<perlfunc/my> for other issues.
+variable.  (They weren't visible at all before version 5.001.)
+
+Formats are the only part of Perl which unconditionally use information
+from a program's locale; if a program's environment specifies an
+LC_NUMERIC locale, it is always used to specify the decimal point
+character in formatted output.  Perl ignores all other aspects of locale
+handling unless the C<use locale> pragma is in effect.  Formatted output
+cannot be controlled by C<use locale> because the pragma is tied to the
+block structure of the program, and, for historical reasons, formats
+exist outside that block structure.  See L<perllocale> for further
+discussion of locale handling.

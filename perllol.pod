@@ -12,7 +12,7 @@ that applies here will also be applicable later on with the fancier data
 structures.
 
 A list of lists, or an array of an array if you would, is just a regular
-old array @LoL that you can get at with two subscripts, like $LoL[3][2].  Here's
+old array @LoL that you can get at with two subscripts, like C<$LoL[3][2]>.  Here's
 a declaration of the array:
 
     # assign to our array a list of list references
@@ -27,7 +27,7 @@ a declaration of the array:
 
 Now you should be very careful that the outer bracket type
 is a round one, that is, parentheses.  That's because you're assigning to
-an @list, so you need parens.  If you wanted there I<not> to be an @LoL,
+an @list, so you need parentheses.  If you wanted there I<not> to be an @LoL,
 but rather just a reference to it, you could do something more like this:
 
     # assign a reference to list of list references
@@ -42,7 +42,7 @@ but rather just a reference to it, you could do something more like this:
 Notice that the outer bracket type has changed, and so our access syntax 
 has also changed.  That's because unlike C, in perl you can't freely
 interchange arrays and references thereto.  $ref_to_LoL is a reference to an 
-array, whereas @LoL is an array proper.  Likewise, $LoL[2] is not an 
+array, whereas @LoL is an array proper.  Likewise, C<$LoL[2]> is not an 
 array, but an array ref.  So how come you can write these:
 
     $LoL[2][2]
@@ -54,7 +54,7 @@ instead of having to write these:
     $ref_to_LoL->[2]->[2]
 
 Well, that's because the rule is that on adjacent brackets only (whether
-square or curly), you are free to omit the pointer dereferencing array.
+square or curly), you are free to omit the pointer dereferencing arrow.
 But you cannot do so for the very first one if it's a scalar containing
 a reference, which means that $ref_to_LoL always needs it.
 
@@ -116,7 +116,7 @@ You also don't have to use push().  You could just make a direct assignment
 if you knew where you wanted to put it:
 
     my (@LoL, $i, $line);
-    for $i ( 0 .. 10 ) 
+    for $i ( 0 .. 10 ) {
 	$line = <>;
 	$LoL[$i] = [ split ' ', $line ];
     } 
@@ -124,7 +124,7 @@ if you knew where you wanted to put it:
 or even just
 
     my (@LoL, $i);
-    for $i ( 0 .. 10 ) 
+    for $i ( 0 .. 10 ) {
 	$LoL[$i] = [ split ' ', <> ];
     } 
 
@@ -133,7 +133,7 @@ in a scalar context without explicitly stating such.
 This would be clearer to the casual reader:
 
     my (@LoL, $i);
-    for $i ( 0 .. 10 ) 
+    for $i ( 0 .. 10 ) {
 	$LoL[$i] = [ split ' ', scalar(<>) ];
     } 
 
@@ -144,10 +144,10 @@ you'd have to do something like this:
 	push @$ref_to_LoL, [ split ];
     } 
 
-Actually, if you were using strict, you'd not only have to declare $ref_to_LoL as
-you had to declare @LoL, but you'd I<also> having to initialize it to a
-reference to an empty list.  (This was a bug in 5.001m that's been fixed
-for the 5.002 release.)
+Actually, if you were using strict, you'd have to declare not only
+$ref_to_LoL as you had to declare @LoL, but you'd I<also> having to
+initialize it to a reference to an empty list.  (This was a bug in
+perl version 5.001m that's been fixed for the 5.002 release.)
 
     my $ref_to_LoL = [];
     while (<>) {
@@ -155,7 +155,7 @@ for the 5.002 release.)
     } 
 
 Ok, now you can add new rows.  What about adding new columns?  If you're
-just dealing with matrices, it's often easiest to use simple assignment:
+dealing with just matrices, it's often easiest to use simple assignment:
 
     for $x (1 .. 10) {
 	for $y (1 .. 10) {
@@ -171,13 +171,13 @@ It doesn't matter whether those elements are already
 there or not: it'll gladly create them for you, setting
 intervening elements to C<undef> as need be.
 
-If you just wanted to append to a row, you'd have
+If you wanted just to append to a row, you'd have
 to do something a bit funnier looking:
 
     # add new columns to an existing row
     push @{ $LoL[0] }, "wilma", "betty";
 
-Notice that I I<couldn't> just say:
+Notice that I I<couldn't> say just:
 
     push $LoL[0], "wilma", "betty";  # WRONG!
 
@@ -187,17 +187,17 @@ to push() must be a real array, not just a reference to such.
 =head1 Access and Printing
 
 Now it's time to print your data structure out.  How 
-are you going to do that?  Well, if you only want one
+are you going to do that?  Well, if you want only one
 of the elements, it's trivial:
 
     print $LoL[0][0];
 
 If you want to print the whole thing, though, you can't
-just say 
+say
 
     print @LoL;		# WRONG
 
-because you'll just get references listed, and perl will never
+because you'll get just references listed, and perl will never
 automatically dereference things for you.  Instead, you have to 
 roll yourself a loop or two.  This prints the whole structure,
 using the shell-style for() construct to loop across the outer
@@ -231,7 +231,7 @@ sometimes is easier to take a temporary on your way through:
 	}
     }
 
-Hm... that's still a bit ugly.  How about this:
+Hmm... that's still a bit ugly.  How about this:
 
     for $i ( 0 .. $#LoL ) {
 	$aref = $LoL[$i];
@@ -266,7 +266,7 @@ That same loop could be replaced with a slice operation:
 but as you might well imagine, this is pretty rough on the reader.
 
 Ah, but what if you wanted a I<two-dimensional slice>, such as having
-$x run from 4..8 and $y run from 7 to 12?  Hm... here's the simple way:
+$x run from 4..8 and $y run from 7 to 12?  Hmm... here's the simple way:
 
     @newLoL = ();
     for ($startx = $x = 4; $x <= 8; $x++) {
@@ -308,6 +308,6 @@ perldata(1), perlref(1), perldsc(1)
 
 =head1 AUTHOR
 
-Tom Christiansen <tchrist@perl.com>
+Tom Christiansen <F<tchrist@perl.com>>
 
 Last udpate: Sat Oct  7 19:35:26 MDT 1995

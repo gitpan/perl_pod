@@ -19,7 +19,7 @@ For ease of access, the Perl manual has been split up into a number
 of sections:
 
     perl	Perl overview (this section)
-    perltoc	Perl documentation table of contents
+    perldelta	Perl changes since previous version
 
     perldata	Perl data structures
     perlsyn	Perl syntax
@@ -31,10 +31,12 @@ of sections:
     perlsub	Perl subroutines
     perlmod	Perl modules
     perlform	Perl formats
+    perllocale	Perl locale support
 
     perlref	Perl references 
     perldsc	Perl data structures intro
     perllol	Perl data structures: lists of lists
+    perltoot	Perl OO tutorial
     perlobj	Perl objects
     perltie	Perl objects hidden behind simple variables
     perlbot	Perl OO tricks and examples
@@ -68,7 +70,7 @@ in the appropriate start-up files.  To find out where these are, type:
     perl -V:man.dir
 
 If the directories were F</usr/local/man/man1> and F</usr/local/man/man3>,
-you would only need to add F</usr/local/man> to your MANPATH.  If 
+you would need to add only F</usr/local/man> to your MANPATH.  If 
 they are different, you'll have to add both stems.
 
 If that doesn't work for some reason, you can still use the
@@ -81,33 +83,35 @@ will often point out exactly where the trouble is.
 
 =head1 DESCRIPTION
 
-Perl is an interpreted language optimized for scanning arbitrary
+Perl is a language optimized for scanning arbitrary
 text files, extracting information from those text files, and printing
 reports based on that information.  It's also a good language for many
 system management tasks.  The language is intended to be practical
 (easy to use, efficient, complete) rather than beautiful (tiny,
 elegant, minimal).
 
-Perl combines (in the author's opinion, anyway) some
-of the best features of C, B<sed>, B<awk>, and B<sh>, so people
-familiar with those languages should have little difficulty with it.
-(Language historians will also note some vestiges of B<csh>, Pascal,
-and even BASIC-PLUS.)  Expression syntax corresponds quite closely to C
+Perl combines (in the author's opinion, anyway) some of the best
+features of C, B<sed>, B<awk>, and B<sh>, so people familiar with
+those languages should have little difficulty with it.  (Language
+historians will also note some vestiges of B<csh>, Pascal, and even
+BASIC-PLUS.)  Expression syntax corresponds quite closely to C
 expression syntax.  Unlike most Unix utilities, Perl does not
 arbitrarily limit the size of your data--if you've got the memory,
-Perl can slurp in your whole file as a single string.  Recursion is
-of unlimited depth.  And the hash tables used by associative arrays
-grow as necessary to prevent degraded performance.  Perl uses
-sophisticated pattern matching techniques to scan large amounts of data
-very quickly.  Although optimized for scanning text, Perl can also
-deal with binary data, and can make dbm files look like associative
-arrays.  Setuid Perl scripts are safer than
-C programs through a dataflow tracing mechanism which prevents many
-stupid security holes.  If you have a problem that would ordinarily use
-B<sed> or B<awk> or B<sh>, but it exceeds their capabilities or must
-run a little faster, and you don't want to write the silly thing in C,
-then Perl may be for you.  There are also translators to turn your
-B<sed> and B<awk> scripts into Perl scripts.
+Perl can slurp in your whole file as a single string.  Recursion is of
+unlimited depth.  And the tables used by hashes (previously called
+"associative arrays") grow as necessary to prevent degraded
+performance.  Perl uses sophisticated pattern matching techniques to
+scan large amounts of data very quickly.  Although optimized for
+scanning text, Perl can also deal with binary data, and can make dbm
+files look like hashes.  Setuid Perl scripts are safer than C programs
+through a dataflow tracing mechanism which prevents many stupid
+security holes.
+
+If you have a problem that would ordinarily use B<sed> or B<awk> or
+B<sh>, but it exceeds their capabilities or must run a little faster,
+and you don't want to write the silly thing in C, then Perl may be for
+you.  There are also translators to turn your B<sed> and B<awk>
+scripts into Perl scripts.
 
 But wait, there's more...
 
@@ -137,7 +141,8 @@ will continue to work unchanged.
 
 Perl variables may now be declared within a lexical scope, like "auto"
 variables in C.  Not only is this more efficient, but it contributes
-to better privacy for "programming in the large".
+to better privacy for "programming in the large".  Anonymous 
+subroutines exhibit deep binding of lexical variables (closures).
 
 =item * Arbitrarily nested data structures
 
@@ -165,7 +170,7 @@ Perl may now be embedded easily in your C or C++ application, and can
 either call or be called by your routines through a documented
 interface.  The XS preprocessor is provided to make it easy to glue
 your C or C++ routines into Perl.  Dynamic loading of modules is
-supported.
+supported, and Perl itself can be made into a dynamic library.
 
 =item * POSIX compliant
 
@@ -190,7 +195,7 @@ to an object class which defines its access methods.
 =item * Subroutine definitions may now be autoloaded
 
 In fact, the AUTOLOAD mechanism also allows you to define any arbitrary
-semantics for undefined subroutine calls.  It's not just for autoloading.
+semantics for undefined subroutine calls.  It's not for just autoloading.
 
 =item * Regular expression enhancements
 
@@ -200,70 +205,34 @@ with embedded whitespace and comments for readability.  A consistent
 extensibility mechanism has been added that is upwardly compatible with
 all old regular expressions.
 
+=item * Innumerable Unbundled Modules
+
+The Comprehensive Perl Archive Network described in L<perlmod>
+contains hundreds of plug-and-play modules full of reusable
+code.  See F<http://www.perl.com/CPAN> for a site near you.
+
+=item * Compilability
+
+While not yet in full production mode, a working perl-to-C compiler
+does exist.  It can generate portable bytecode, simple C, or
+optimized C code.
+
 =back
 
 Ok, that's I<definitely> enough hype.
 
 =head1 ENVIRONMENT
 
-=over 12
-
-=item HOME
-
-Used if chdir has no argument.
-
-=item LOGDIR
-
-Used if chdir has no argument and HOME is not set.
-
-=item PATH
-
-Used in executing subprocesses, and in finding the script if B<-S> is
-used.
-
-=item PERL5LIB
-
-A colon-separated list of directories in which to look for Perl library
-files before looking in the standard library and the current
-directory.  If PERL5LIB is not defined, PERLLIB is used.  When running
-taint checks (because the script was running setuid or setgid, or the
-B<-T> switch was used), neither variable is used.  The script should
-instead say
-
-    use lib "/my/directory";
-
-=item PERL5DB
-
-The command used to get the debugger code.  If unset, uses
-
-	BEGIN { require 'perl5db.pl' }
-
-=item PERLLIB
-
-A colon-separated list of directories in which to look for Perl library
-files before looking in the standard library and the current
-directory.  If PERL5LIB is defined, PERLLIB is not used.
-
-=back
-
-Apart from these, Perl uses no other environment variables, except
-to make them available to the script being executed, and to child
-processes.  However, scripts running setuid would do well to execute
-the following lines before doing anything else, just to keep people
-honest:
-
-    $ENV{'PATH'} = '/bin:/usr/bin';    # or whatever you need
-    $ENV{'SHELL'} = '/bin/sh' if defined $ENV{'SHELL'};
-    $ENV{'IFS'} = ''          if defined $ENV{'IFS'};
+See L<perlrun>.
 
 =head1 AUTHOR
 
-Larry Wall E<lt>F<lwall@sems.com>E<gt>, with the help of oodles of other folks.
+Larry Wall <F<larry@wall.org>>, with the help of oodles of other folks.
 
 =head1 FILES
 
  "/tmp/perl-e$$"	temporary file for -e commands
- "@INC"			locations of perl 5 libraries
+ "@INC"			locations of perl libraries
 
 =head1 SEE ALSO
 
@@ -293,8 +262,8 @@ switch?
 The B<-w> switch is not mandatory.
 
 Perl is at the mercy of your machine's definitions of various
-operations such as type casting, atof() and sprintf().  The latter
-can even trigger a coredump when passed ludicrous input values.
+operations such as type casting, atof(), and sprintf().  The latter
+can even trigger a core dump when passed ludicrous input values.
 
 If your stdio requires a seek or eof between reads and writes on a
 particular stream, so does Perl.  (This doesn't apply to sysread()
@@ -306,10 +275,9 @@ given variable name may not be longer than 255 characters, and no
 component of your PATH may be longer than 255 if you use B<-S>.  A regular
 expression may not compile to more than 32767 bytes internally.
 
-See the perl bugs database at F< http://perl.com/perl/bugs/ >.  You may
-mail your bug reports (be sure to include full configuration information
-as output by the myconfig program in the perl source tree) to
-F<perlbug@perl.com>.
+You may mail your bug reports (be sure to include full configuration
+information as output by the myconfig program in the perl source tree,
+or by C<perl -V>) to <F<perlbug@perl.com>>.
 If you've succeeded in compiling perl, the perlbug script in the utils/
 subdirectory can be used to help mail in a bug report.
 

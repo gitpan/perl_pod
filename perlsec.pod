@@ -1,4 +1,3 @@
-
 =head1 NAME
 
 perlsec - Perl security
@@ -17,7 +16,7 @@ Perl automatically enables a set of special security checks, called I<taint
 mode>, when it detects its program running with differing real and effective
 user or group IDs.  The setuid bit in Unix permissions is mode 04000, the
 setgid bit mode 02000; either or both may be set.  You can also enable taint
-mode explicitly by using the the B<-T> command line flag. This flag is
+mode explicitly by using the B<-T> command line flag. This flag is
 I<strongly> suggested for server programs and any program run on behalf of
 someone else, such as a CGI script.
 
@@ -31,20 +30,23 @@ program more secure than the corresponding C program.
 
 You may not use data derived from outside your program to affect something
 else outside your program--at least, not by accident.  All command-line
-arguments, environment variables, and file input are marked as "tainted".
-Tainted data may not be used directly or indirectly in any command that
-invokes a subshell, nor in any command that modifies files, directories,
-or processes.  Any variable set within an expression that has previously
-referenced a tainted value itself becomes tainted, even if it is logically
-impossible for the tainted value to influence the variable.  Because
-taintedness is associated with each scalar value, some elements of an
-array can be tainted and others not.
+arguments, environment variables, locale information (see L<perllocale>),
+and file input are marked as "tainted".  Tainted data may not be used
+directly or indirectly in any command that invokes a sub-shell, nor in any
+command that modifies files, directories, or processes.  Any variable set
+within an expression that has previously referenced a tainted value itself
+becomes tainted, even if it is logically impossible for the tainted value
+to influence the variable.  Because taintedness is associated with each
+scalar value, some elements of an array can be tainted and others not.
 
 For example:
 
     $arg = shift;		# $arg is tainted
     $hid = $arg, 'bar';		# $hid is also tainted
     $line = <>;			# Tainted
+    $line = <STDIN>;		# Also tainted
+    open FOO, "/home/me/bar" or die $!;
+    $line = <FOO>;		# Still tainted
     $path = $ENV{'PATH'};	# Tainted, but see below
     $data = 'abc';		# Not tainted
 
@@ -102,16 +104,16 @@ taintedness.  Instead, the slightly more efficient and conservative
 approach is used that if any tainted value has been accessed within the
 same expression, the whole expression is considered tainted.
 
-But testing for taintedness only gets you so far.  Sometimes you just have
+But testing for taintedness gets you only so far.  Sometimes you have just
 to clear your data's taintedness.  The only way to bypass the tainting
-mechanism is by referencing subpatterns from a regular expression match.
+mechanism is by referencing sub-patterns from a regular expression match.
 Perl presumes that if you reference a substring using $1, $2, etc., that
 you knew what you were doing when you wrote the pattern.  That means using
 a bit of thought--don't just blindly untaint anything, or you defeat the
-entire mechanism.  It's better to verify that the variable has only
-good characters (for certain values of "good") rather than checking
-whether it has any bad characters.  That's because it's far too easy to
-miss bad characters that you never thought of.  
+entire mechanism.  It's better to verify that the variable has only good
+characters (for certain values of "good") rather than checking whether it
+has any bad characters.  That's because it's far too easy to miss bad
+characters that you never thought of.
 
 Here's a test to make sure that the data contains nothing but "word"
 characters (alphabetics, numerics, and underscores), a hyphen, an at sign,
@@ -123,7 +125,7 @@ or a dot.
 	die "Bad data in $data"; 	# log this somewhere
     }
 
-This is fairly secure since C</\w+/> doesn't normally match shell
+This is fairly secure because C</\w+/> doesn't normally match shell
 metacharacters, nor are dot, dash, or at going to mean something special
 to the shell.  Use of C</.+/> would have been insecure in theory because
 it lets everything through, but Perl doesn't check for that.  The lesson
@@ -132,9 +134,28 @@ Laundering data using regular expression is the I<ONLY> mechanism for
 untainting dirty data, unless you use the strategy detailed below to fork
 a child of lesser privilege.
 
+The example does not untaint $data if C<use locale> is in effect,
+because the characters matched by C<\w> are determined by the locale.
+Perl considers that locale definitions are untrustworthy because they
+contain data from outside the program.  If you are writing a
+locale-aware program, and want to launder data with a regular expression
+containing C<\w>, put C<no locale> ahead of the expression in the same
+block.  See L<perllocale/SECURITY> for further discussion and examples.
+
+=head2 Switches On the "#!" Line
+
+When you make a script executable, in order to make it usable as a
+command, the system will pass switches to perl from the script's #!
+line.  Perl checks that any command-line switches given to a setuid
+(or setgid) script actually match the ones set on the #! line.  Some
+UNIX and UNIX-like environments impose a one-switch limit on the #!
+line, so you may need to use something like C<-wU> instead of C<-w -U>
+under such systems.  (This issue should arise only in UNIX or
+UNIX-like environments that support #! and setuid or setgid scripts.)
+
 =head2 Cleaning Up Your Path
 
-For "Insecure $ENV{PATH}" messages, you need to set C<$ENV{'PATH'}> to a
+For "Insecure C<$ENV{PATH}>" messages, you need to set C<$ENV{'PATH'}> to a
 known value, and each directory in the path must be non-writable by others
 than its owner and group.  You may be surprised to get this message even
 if the pathname to your executable is fully qualified.  This is I<not>
@@ -156,7 +177,7 @@ prevent stupid mistakes, not to remove the need for thought.
 Perl does not call the shell to expand wild cards when you pass B<system>
 and B<exec> explicit parameter lists instead of strings with possible shell
 wildcards in them.  Unfortunately, the B<open>, B<glob>, and
-backtick functions provide no such alternate calling convention, so more
+back-tick functions provide no such alternate calling convention, so more
 subterfuge will be required.  
 
 Perl provides a reasonably safe way to open a file or pipe from a setuid
@@ -168,11 +189,11 @@ environment variables, umasks, current working directories, back to the
 originals or known safe values.  Then the child process, which no longer
 has any special permissions, does the B<open> or other system call.
 Finally, the child passes the data it managed to access back to the
-parent.  Since the file or pipe was opened in the child while running
+parent.  Because the file or pipe was opened in the child while running
 under less privilege than the parent, it's not apt to be tricked into
 doing something it shouldn't.
 
-Here's a way to do backticks reasonably safely.  Notice how the B<exec> is
+Here's a way to do back-ticks reasonably safely.  Notice how the B<exec> is
 not called with a string that the shell could expand.  This is by far the
 best way to call something that might be subjected to shell escapes: just
 never call the shell at all.  By the time we get to the B<exec>, tainting

@@ -47,8 +47,7 @@ You have to decide whether your array has numeric or string indices.
 
 =item *
 
-Associative array values do not spring into existence upon mere
-reference.
+Hash values do not spring into existence upon mere reference.
 
 =item *
 
@@ -69,13 +68,13 @@ executed.)  See L<perlvar>.
 
 =item *
 
-$<I<digit>> does not refer to fields--it refers to substrings matched by
-the last match pattern.
+$E<lt>I<digit>E<gt> does not refer to fields--it refers to substrings matched
+by the last match pattern.
 
 =item *
 
 The print() statement does not add field and record separators unless
-you set C<$,> and C<$.>.  You can set $OFS and $ORS if you're using
+you set C<$,> and C<$\>.  You can set $OFS and $ORS if you're using
 the English module.
 
 =item *
@@ -101,9 +100,9 @@ basically incompatible with C.)
 =item *
 
 The concatenation operator is ".", not the null string.  (Using the
-null string would render C</pat/ /pat/> unparsable, since the third slash
-would be interpreted as a division operator--the tokener is in fact
-slightly context sensitive for operators like "/", "?", and ">".
+null string would render C</pat/ /pat/> unparsable, because the third slash
+would be interpreted as a division operator--the tokenizer is in fact
+slightly context sensitive for operators like "/", "?", and "E<gt>".
 And in fact, "." itself can be the beginning of a number.)
 
 =item *
@@ -183,7 +182,7 @@ Comments begin with "#", not "/*".
 =item *
 
 You can't take the address of anything, although a similar operator
-in Perl 5 is the backslash, which creates a reference.
+in Perl is the backslash, which creates a reference.
 
 =item *
 
@@ -231,18 +230,18 @@ Sharp shell programmers should take note of the following:
 
 =item *
 
-The backtick operator does variable interpolation without regard to
+The back-tick operator does variable interpolation without regard to
 the presence of single quotes in the command.
 
 =item *
 
-The backtick operator does no translation of the return value, unlike B<csh>.
+The back-tick operator does no translation of the return value, unlike B<csh>.
 
 =item *
 
 Shells (especially B<csh>) do several levels of substitution on each
-command line.  Perl does substitution only in certain constructs
-such as double quotes, backticks, angle brackets, and search patterns.
+command line.  Perl does substitution in only certain constructs
+such as double quotes, back-ticks, angle brackets, and search patterns.
 
 =item *
 
@@ -275,16 +274,16 @@ context than they do in a scalar one.  See L<perldata> for details.
 =item *
 
 Avoid barewords if you can, especially all lower-case ones.
-You can't tell just by looking at it whether a bareword is 
+You can't tell by just looking at it whether a bareword is 
 a function or a string.  By using quotes on strings and 
-parens on function calls, you won't ever get them confused.
+parentheses on function calls, you won't ever get them confused.
 
 =item *
 
 You cannot discern from mere inspection which built-ins
 are unary operators (like chop() and chdir()) 
 and which are list operators (like print() and unlink()).
-(User-defined subroutines can B<only> be list operators, never
+(User-defined subroutines can be B<only> list operators, never
 unary ones.)  See L<perlop>.
 
 =item *
@@ -295,8 +294,8 @@ you might expect to do not.
 
 =item *
 
-The <FH> construct is not the name of the filehandle, it is a readline
-operation on that handle.  The data read is only assigned to $_ if the
+The E<lt>FHE<gt> construct is not the name of the filehandle, it is a readline
+operation on that handle.  The data read is assigned to $_ only if the
 file read is the sole condition in a while loop:
 
     while (<FH>)      { }
@@ -332,7 +331,7 @@ external name is still an alias for the original.
 
 =back
 
-=head2 Perl4 to Perl5  Traps
+=head2 Perl4 to Perl5 Traps
 
 Practicing Perl4 Programmers should take note of the following 
 Perl4-to-Perl5 specific traps.
@@ -392,8 +391,8 @@ Everything else.
 =back
 
 If you find an example of a conversion trap that is not listed here,
-please submit it to Bill Middleton F<wjm@best.com> for inclusion.
-Also note that at least some of these can be caught with C<-w>.
+please submit it to Bill Middleton <F<wjm@best.com>> for inclusion.
+Also note that at least some of these can be caught with B<-w>.
 
 =head2 Discontinuance, Deprecation, and BugFix traps
 
@@ -419,7 +418,7 @@ for C<$_> itself (and C<@_>, etc.).
 =item * Deprecation 
 
 Double-colon is now a valid package separator in a variable name.  Thus these
-behave differently in perl4 vs. perl5, since the packages don't exist.
+behave differently in perl4 vs. perl5, because the packages don't exist.
 
     $a=1;$b=2;$c=3;$var=4;
     print "$a::$b::$c ";
@@ -549,6 +548,36 @@ behave like C<split /\s+/> (which does).
     # perl4 prints: :hi:mom
     # perl5 prints: hi:mom
 
+=item * BugFix
+
+Perl 4 would ignore any text which was attached to an B<-e> switch,
+always taking the code snippet from the following arg.  Additionally, it
+would silently accept an B<-e> switch without a following arg.  Both of
+these behaviors have been fixed.
+
+    perl -e'print "attached to -e"' 'print "separate arg"'
+    
+    # perl4 prints: separate arg
+    # perl5 prints: attached to -e
+    
+    perl -e
+
+    # perl4 prints:
+    # perl5 dies: No code specified for -e.
+
+=item * Discontinuance
+
+In Perl 4 the return value of C<push> was undocumented, but it was
+actually the last value being pushed onto the target list.  In Perl 5
+the return value of C<push> is documented, but has changed, it is the
+number of elements in the resulting list.
+
+    @x = ('existing');
+    print push(@x, 'first new', 'second new');
+    
+    # perl4 prints: second new
+    # perl5 prints: 3
+
 =item * Deprecation
 
 Some error messages will be different.
@@ -622,9 +651,10 @@ Formatted output and significant digits
 
 =item * Numerical
 
-This specific item has been deleted.  It demonstrated how the autoincrement
+This specific item has been deleted.  It demonstrated how the auto-increment
 operator would not catch when a number went over the signed int limit.  Fixed
-in 5.003_04.  But always be wary when using large ints.  If in doubt:
+in version 5.003_04.  But always be wary when using large integers.
+If in doubt:
 
    use Math::BigInt;
 
@@ -633,15 +663,15 @@ in 5.003_04.  But always be wary when using large ints.  If in doubt:
 Assignment of return values from numeric equality tests
 does not work in perl5 when the test evaluates to false (0).
 Logical tests now return an null, instead of 0
- 
+
     $p = ($test == 1);
     print $p,"\n";
-  
+
     # perl4 prints: 0
     # perl5 prints:
 
-Also see the L<General Regular Expression Traps> tests for another example 
-of this new feature...
+Also see the L<General Regular Expression Traps using s///, etc.>
+tests for another example of this new feature...
 
 =back
 
@@ -710,7 +740,7 @@ variable is localized subsequent to the assignment
     print "@fred";  # should print "1, 2, 4"
  
     # perl4 prints: 1 2 4
-    # perl5 prints: Literal @fred now requires backslash 
+    # perl5 prints: In string, @fred now must be written as \@fred
 
 =item * (Scalar String)
 
@@ -764,8 +794,8 @@ The behavior is slightly different for:
 =item * (Variable Suicide)
 
 Variable suicide behavior is more consistent under Perl 5.
-Perl5 exhibits the same behavior for associative arrays and scalars,
-that perl4 exhibits only for scalars.
+Perl5 exhibits the same behavior for hashes and scalars,
+that perl4 exhibits for only scalars.
 
     $aGlobal{ "aKey" } = "global value";
     print "MAIN:", $aGlobal{"aKey"}, "\n";
@@ -904,7 +934,7 @@ of assignment.  Perl 4 mistakenly gave them the precedence of the associated
 operator.  So you now must parenthesize them in expressions like
 
     /foo/ ? ($a += 2) : ($a -= 2);
-    
+
 Otherwise
 
     /foo/ ? $a += 2 : $a -= 2
@@ -923,8 +953,8 @@ now works as a C programmer would expect.
 
     open FOO || die;
 
-is now incorrect.  You need parens around the filehandle.
-Otherwise, perl5 leaves the statement as it's default precedence:
+is now incorrect.  You need parentheses around the filehandle.
+Otherwise, perl5 leaves the statement as its default precedence:
 
     open(FOO || die);
  
@@ -1025,8 +1055,8 @@ Also see L<Numerical Traps> for another example of this new feature.
 
 =item * Regular Expression
 
-C<s`lhs`rhs`> (using backticks) is now a normal substitution, with no 
-backtick expansion
+C<s`lhs`rhs`> (using back-ticks) is now a normal substitution, with no 
+back-tick expansion
 
     $string = "";
     $string =~ s`^`hostname`;
@@ -1077,6 +1107,26 @@ repeatedly, like C</x/> or C<m!x!>.
     # perl5 prints: perl5
 
 
+=item * Regular Expression
+
+Under perl4 and upto version 5.003, a failed C<m//g> match used to
+reset the internal iterator, so that subsequent C<m//g> match attempts
+began from the beginning of the string.  In perl version 5.004 and later,
+failed C<m//g> matches do not reset the iterator position (which can be
+found using the C<pos()> function--see L<perlfunc/pos>).
+
+    $test = "foop";
+    for (1..3) {
+        print $1 while ($test =~ /(o)/g);
+        # pos $test = 0;     # to get old behavior
+    }
+ 
+    # perl4     prints: oooooo
+    # perl5.004 prints: oo
+
+You may always reset the iterator yourself as shown in the commented line
+to get the old behavior.
+
 =back
 
 =head2 Subroutine, Signal, Sorting Traps
@@ -1111,7 +1161,10 @@ reverse is no longer allowed as the name of a sort subroutine.
     # perl4 prints: yup yup yup yup abc
     # perl5 prints: abc 
 
-=item * warn() specifically implies STDERR
+=item * warn() won't let you specify a filehandle.
+
+Although it _always_ printed to STDERR, warn() would let you specify a
+filehandle in perl4.  With perl5 it does not.
 
     warn STDERR "Foo!";
 
@@ -1131,7 +1184,7 @@ within  the signal handler function, each time a signal was handled with
 perl4.  With perl5, the reset is now done correctly.  Any code relying 
 on the handler _not_ being reset will have to be reworked.
 
-5.002 and beyond uses sigaction() under SysV
+Since version 5.002, Perl uses sigaction() under SysV.
 
     sub gotit {
         print "Got @_... "; 
@@ -1154,7 +1207,7 @@ on the handler _not_ being reset will have to be reworked.
 =item * (SysV)
 
 Under SysV OS's, C<seek()> on a file opened to append C<E<gt>E<gt>> now does 
-the right thing w.r.t. the fopen() man page. e.g. - When a file is opened
+the right thing w.r.t. the fopen() man page. e.g., - When a file is opened
 for append,  it  is  impossible to overwrite information already in
 the file.
 
@@ -1176,6 +1229,9 @@ the file.
 
 =head2 Interpolation Traps
 
+Perl4-to-Perl5 traps having to do with how things get interpolated
+within certain expressions, statements, contexts, or whatever.
+
 =over 5
 
 =item * Interpolation
@@ -1185,12 +1241,9 @@ the file.
     print "To: someone@somewhere.com\n"; 
  
     # perl4 prints: To:someone@somewhere.com
-    # perl5 errors : Literal @somewhere now requires backslash
+    # perl5 errors : In string, @somewhere now must be written as \@somewhere
 
 =item * Interpolation
-
-Perl4-to-Perl5 traps having to do with how things get interpolated
-within certain expressions, statements, contexts, or whatever.
 
 Double-quoted strings may no longer end with an unescaped $ or @.
 
@@ -1202,6 +1255,23 @@ Double-quoted strings may no longer end with an unescaped $ or @.
     # perl5 errors: Final $ should be \$ or $name
 
 Note: perl5 DOES NOT error on the terminating @ in $bar
+
+=item * Interpolation
+
+Perl now sometimes evaluates arbitrary expressions inside braces that occur
+within double quotes (usually when the opening brace is preceded by C<$>
+or C<@>).
+
+    @www = "buz";
+    $foo = "foo";
+    $bar = "bar";
+    sub foo { return "bar" };
+    print "|@{w.w.w}|${main'foo}|";
+
+    # perl4 prints: |@{w.w.w}|foo|
+    # perl5 prints: |buz|bar|
+
+Note that you can C<use strict;> to ward off such trappiness under perl5.
 
 =item * Interpolation
 

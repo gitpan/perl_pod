@@ -7,7 +7,7 @@ perlvar - Perl predefined variables
 =head2 Predefined Names
 
 The following names have special meaning to Perl.  Most of the
-punctuational names have reasonable mnemonics, or analogues in one of
+punctuation names have reasonable mnemonics, or analogues in one of
 the shells.  Nevertheless, if you wish to use the long variable names,
 you just need to say
 
@@ -51,7 +51,7 @@ a reference, you'll raise a run-time exception.
 The default input and pattern-searching space.  The following pairs are
 equivalent:
 
-    while (<>) {...}	# only equivalent in while!
+    while (<>) {...}	# equivalent in only while!
     while ($_ = <>) {...}
 
     /^Subject:/
@@ -106,9 +106,9 @@ test.  Note that outside of a C<while> test, this will not happen.
 
 =over 8
 
-=item $<I<digit>>
+=item $E<lt>I<digit>E<gt>
 
-Contains the subpattern from the corresponding set of parentheses in
+Contains the sub-pattern from the corresponding set of parentheses in
 the last pattern matched, not counting patterns matched in nested
 blocks that have been exited already.  (Mnemonic: like \digit.)
 These variables are all read-only.
@@ -127,7 +127,7 @@ BLOCK).  (Mnemonic: like & in some editors.)  This variable is read-only.
 
 The string preceding whatever was matched by the last successful
 pattern match (not counting any matches hidden within a BLOCK or eval
-enclosed by the current BLOCK).  (Mnemonic: ` often precedes a quoted
+enclosed by the current BLOCK).  (Mnemonic: C<`> often precedes a quoted
 string.)  This variable is read-only.
 
 =item $POSTMATCH
@@ -136,7 +136,7 @@ string.)  This variable is read-only.
 
 The string following whatever was matched by the last successful
 pattern match (not counting any matches hidden within a BLOCK or eval()
-enclosed by the current BLOCK).  (Mnemonic: ' often follows a quoted
+enclosed by the current BLOCK).  (Mnemonic: C<'> often follows a quoted
 string.)  Example:
 
     $_ = 'abcdefghi';
@@ -162,15 +162,15 @@ This variable is read-only.
 
 =item $*
 
-Set to 1 to do multiline matching within a string, 0 to tell Perl
+Set to 1 to do multi-line matching within a string, 0 to tell Perl
 that it can assume that strings contain a single line, for the purpose
 of optimizing pattern matches.  Pattern matches on strings containing
 multiple newlines can produce confusing results when "C<$*>" is 0.  Default
 is 0.  (Mnemonic: * matches multiple things.)  Note that this variable
-only influences the interpretation of "C<^>" and "C<$>".  A literal newline can
+influences the interpretation of only "C<^>" and "C<$>".  A literal newline can
 be searched for even when C<$* == 0>.
 
-Use of "C<$*>" is deprecated in Perl 5.
+Use of "C<$*>" is deprecated in modern perls.
 
 =item input_line_number HANDLE EXPR
 
@@ -181,8 +181,8 @@ Use of "C<$*>" is deprecated in Perl 5.
 =item $.
 
 The current input line number for the last file handle from
-which you read (or performed a C<seek> or <tell> on).  An
-explicit close on a filehandle resets the line number.  Since
+which you read (or performed a C<seek> or C<tell> on).  An
+explicit close on a filehandle resets the line number.  Because
 "C<E<lt>E<gt>>" never does an explicit close, line numbers increase
 across ARGV files (but see examples under eof()).  Localizing C<$.> has
 the effect of also localizing Perl's notion of "the last read
@@ -199,7 +199,7 @@ number.)
 
 The input record separator, newline by default.  Works like B<awk>'s RS
 variable, including treating empty lines as delimiters if set to the
-null string.  (Note:  An empty line can not contain any spaces or
+null string.  (Note:  An empty line cannot contain any spaces or
 tabs.) You may set it to a multicharacter string to match a
 multi-character delimiter.  Note that setting it to C<"\n\n"> means
 something slightly different than setting it to C<"">, if the file
@@ -221,8 +221,8 @@ delimit line boundaries when quoting poetry.)
 
 If set to nonzero, forces a flush after every write or print on the
 currently selected output channel.  Default is 0 (regardless of whether
-the channel is actually buffered by the system or not; C<$|> only tells
-you whether you've asked Perl to explicitly flush after each write). 
+the channel is actually buffered by the system or not; C<$|> tells you
+only whether you've asked Perl explicitly to flush after each write). 
 Note that STDOUT will typically be line buffered if output is to the
 terminal and block buffered otherwise.  Setting this variable is useful
 primarily when you are outputting to a pipe, such as when you are running
@@ -239,8 +239,8 @@ has no effect on input buffering.
 =item $,
 
 The output field separator for the print operator.  Ordinarily the
-print operator simply prints out the comma separated fields you
-specify.  In order to get behavior more like B<awk>, set this variable
+print operator simply prints out the comma-separated fields you
+specify.  To get behavior more like B<awk>, set this variable
 as you would set B<awk>'s OFS variable to specify what is printed
 between fields.  (Mnemonic: what is printed when there is a , in your
 print statement.)
@@ -254,12 +254,12 @@ print statement.)
 =item $\
 
 The output record separator for the print operator.  Ordinarily the
-print operator simply prints out the comma separated fields you
-specify, with no trailing newline or record separator assumed.  In
-order to get behavior more like B<awk>, set this variable as you would
+print operator simply prints out the comma-separated fields you
+specify, with no trailing newline or record separator assumed.
+To get behavior more like B<awk>, set this variable as you would
 set B<awk>'s ORS variable to specify what is printed at the end of the
 print.  (Mnemonic: you set "C<$\>" instead of adding \n at the end of the
-print.  Also, it's just like /, but it's what you get "back" from
+print.  Also, it's just like C<$/>, but it's what you get "back" from
 Perl.)
 
 =item $LIST_SEPARATOR
@@ -299,7 +299,7 @@ keys contain binary data there might not be any safe value for "C<$;>".
 semi-semicolon.  Yeah, I know, it's pretty lame, but "C<$,>" is already
 taken for something more important.)
 
-Consider using "real" multi-dimensional arrays in Perl 5.
+Consider using "real" multi-dimensional arrays.
 
 =item $OFMT
 
@@ -313,7 +313,7 @@ of the macro DBL_DIG from your system's F<float.h>.  This is different from
 B<awk>'s default OFMT setting of %.6g, so you need to set "C<$#>"
 explicitly to get B<awk>'s value.  (Mnemonic: # is the number sign.)
 
-Use of "C<$#>" is deprecated in Perl 5.
+Use of "C<$#>" is deprecated.
 
 =item format_page_number HANDLE EXPR
 
@@ -379,7 +379,7 @@ poetry is a part of a line.)
 
 =item $^L
 
-What formats output to perform a formfeed.  Default is \f.
+What formats output to perform a form feed.  Default is \f.
 
 =item $ACCUMULATOR
 
@@ -396,12 +396,24 @@ L<perlfunc/formline()>.
 
 =item $?
 
-The status returned by the last pipe close, backtick (C<``>) command,
+The status returned by the last pipe close, back-tick (C<``>) command,
 or system() operator.  Note that this is the status word returned by
-the wait() system call, so the exit value of the subprocess is actually
-(C<$? E<gt>E<gt> 8>).  Thus on many systems, C<$? & 255> gives which signal,
-if any, the process died from, and whether there was a core dump.
-(Mnemonic: similar to B<sh> and B<ksh>.)
+the wait() system call (or else is made up to look like it).  Thus,
+the exit value of the subprocess is actually (C<$? E<gt>E<gt> 8>), and
+C<$? & 255> gives which signal, if any, the process died from, and
+whether there was a core dump.  (Mnemonic: similar to B<sh> and
+B<ksh>.)
+
+Note that if you have installed a signal handler for C<SIGCHLD>, the
+value of C<$?> will usually be wrong outside that handler.
+
+Inside an C<END> subroutine C<$?> contains the value that is going to be
+given to C<exit()>.  You can modify C<$?> in an C<END> subroutine to
+change the exit status of the script.
+
+Under VMS, the pragma C<use vmsish 'status'> makes C<$?> reflect the
+actual VMS exit status, instead of the default emulation of POSIX
+status.
 
 =item $OS_ERROR
 
@@ -414,7 +426,7 @@ all the usual caveats.  (This means that you shouldn't depend on the
 value of "C<$!>" to be anything in particular unless you've gotten a
 specific error return indicating a system error.)  If used in a string
 context, yields the corresponding system error string.  You can assign
-to "C<$!>" in order to set I<errno> if, for instance, you want "C<$!>" to return the
+to "C<$!>" to set I<errno> if, for instance, you want "C<$!>" to return the
 string for error I<n>, or you want to set the exit value for the die()
 operator.  (Mnemonic: What just went bang?)
 
@@ -422,10 +434,9 @@ operator.  (Mnemonic: What just went bang?)
 
 =item $^E
 
-More specific information about the last system error than that
-provided by C<$!>, if available.  (If not, it's just C<$!> again, except
-OS/2.)
-At the moment, this differs from C<$!> only under VMS and OS/2, where it
+More specific information about the last system error than that provided by
+C<$!>, if available.  (If not, it's just C<$!> again, except under OS/2.)
+At the moment, this differs from C<$!> under only VMS and OS/2, where it
 provides the VMS status value from the last system error, and OS/2 error
 code of the last call to OS/2 API which was not directed via CRT.  The
 caveats mentioned in the description of C<$!> apply here, too.
@@ -444,7 +455,8 @@ invoked may have failed in the normal fashion).  (Mnemonic: Where was
 the syntax error "at"?)
 
 Note that warning messages are not collected in this variable.  You can,
-however, set up a routine to process warnings by setting $SIG{__WARN__} below.
+however, set up a routine to process warnings by setting C<$SIG{__WARN__}>
+below.
 
 =item $PROCESS_ID
 
@@ -476,7 +488,7 @@ The effective uid of this process.  Example:
     ($<,$>) = ($>,$<);	# swap real and effective uid
 
 (Mnemonic: it's the uid you went I<TO>, if you're running setuid.)  Note:
-"C<$E<lt>>" and "C<$E<gt>>" can only be swapped on machines supporting setreuid().
+"C<$E<lt>>" and "C<$E<gt>>" can be swapped on only machines supporting setreuid().
 
 =item $REAL_GROUP_ID
 
@@ -505,10 +517,11 @@ which may be the same as the first number.  (Mnemonic: parentheses are
 used to I<GROUP> things.  The effective gid is the group that's I<RIGHT> for
 you, if you're running setgid.)
 
-Note: "C<$E<lt>>", "C<$E<gt>>", "C<$(>" and "C<$)>" can only be set on machines
-that support the corresponding I<set[re][ug]id()> routine.  "C<$(>" and "C<$)>" 
-can only be swapped on machines supporting setregid().   Because Perl doesn't
-currently use initgroups(), you can't set your group vector to multiple groups.
+Note: "C<$E<lt>>", "C<$E<gt>>", "C<$(>" and "C<$)>" can be set only on
+machines that support the corresponding I<set[re][ug]id()> routine.  "C<$(>"
+and "C<$)>" can be swapped on only machines supporting setregid().  Because
+Perl doesn't currently use initgroups(), you can't set your group vector to
+multiple groups.
 
 =item $PROGRAM_NAME
 
@@ -607,7 +620,7 @@ it.
 =item $^T
 
 The time at which the script began running, in seconds since the
-epoch (beginning of 1970).  The values returned by the B<-M>, B<-A> 
+epoch (beginning of 1970).  The values returned by the B<-M>, B<-A>,
 and B<-C> filetests are
 based on this value.
 
@@ -626,13 +639,13 @@ The name that the Perl binary itself was executed as, from C's C<argv[0]>.
 
 =item $ARGV
 
-contains the name of the current file when reading from <>.
+contains the name of the current file when reading from E<lt>E<gt>.
 
 =item @ARGV
 
 The array @ARGV contains the command line arguments intended for the
 script.  Note that C<$#ARGV> is the generally number of arguments minus
-one, since C<$ARGV[0]> is the first argument, I<NOT> the command name.  See
+one, because C<$ARGV[0]> is the first argument, I<NOT> the command name.  See
 "C<$0>" for the command name.
 
 =item @INC
@@ -642,8 +655,8 @@ be evaluated by the C<do EXPR>, C<require>, or C<use> constructs.  It
 initially consists of the arguments to any B<-I> command line switches,
 followed by the default Perl library, probably F</usr/local/lib/perl>,
 followed by ".", to represent the current directory.  If you need to
-modify this at runtime, you should use the C<use lib> pragma in order
-to also get the machine-dependent library properly loaded:
+modify this at runtime, you should use the C<use lib> pragma
+to get the machine-dependent library properly loaded also:
 
     use lib '/mypath/libdir/';
     use SomeMod;
@@ -679,7 +692,7 @@ signals.  Example:
     $SIG{'INT'} = 'DEFAULT';	# restore default action
     $SIG{'QUIT'} = 'IGNORE';	# ignore SIGQUIT
 
-The %SIG array only contains values for the signals actually set within
+The %SIG array contains values for only the signals actually set within
 the Perl script.  Here are some other examples:
 
     $SIG{PIPE} = Plumber;       # SCARY!!
@@ -690,10 +703,26 @@ the Perl script.  Here are some other examples:
 The one marked scary is problematic because it's a bareword, which means
 sometimes it's a string representing the function, and sometimes it's 
 going to call the subroutine call right then and there!  Best to be sure
-and quote it or take a reference to it.  *Plumber works too.  See L<perlsubs>.
+and quote it or take a reference to it.  *Plumber works too.  See L<perlsub>.
+
+If your system has the sigaction() function then signal handlers are
+installed using it.  This means you get reliable signal handling.  If
+your system has the SA_RESTART flag it is used when signals handlers are
+installed.  This means that system calls for which it is supported
+continue rather than returning when a signal arrives.  If you want your
+system calls to be interrupted by signal delivery then do something like
+this:
+
+    use POSIX ':signal_h';
+
+    my $alarm = 0;
+    sigaction SIGALRM, new POSIX::SigAction sub { $alarm = 1 }
+    	or die "Error setting SIGALRM handler: $!\n";
+
+See L<POSIX>.
 
 Certain internal hooks can be also set using the %SIG hash.  The
-routine indicated by $SIG{__WARN__} is called when a warning message is
+routine indicated by C<$SIG{__WARN__}> is called when a warning message is
 about to be printed.  The warning message is passed as the first
 argument.  The presence of a __WARN__ hook causes the ordinary printing
 of warnings to STDERR to be suppressed.  You can use this to save warnings
@@ -702,12 +731,13 @@ in a variable, or turn warnings into fatal errors, like this:
     local $SIG{__WARN__} = sub { die $_[0] };
     eval $proggie;
 
-The routine indicated by $SIG{__DIE__} is called when a fatal exception
+The routine indicated by C<$SIG{__DIE__}> is called when a fatal exception
 is about to be thrown.  The error message is passed as the first
 argument.  When a __DIE__ hook routine returns, the exception
 processing continues as it would have in the absence of the hook,
 unless the hook routine itself exits via a C<goto>, a loop exit, or a die().
-The __DIE__ handler is explicitly disabled during the call, so that you
-can die from a __DIE__ handler.  Similarly for __WARN__.
+The C<__DIE__> handler is explicitly disabled during the call, so that you
+can die from a C<__DIE__> handler.  Similarly for C<__WARN__>.  See
+L<perlfunc/die>, L<perlfunc/warn> and L<perlfunc/eval>.
 
 =back

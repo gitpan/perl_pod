@@ -1,6 +1,6 @@
 =head1 NAME
 
-perlio - perl's IO abstraction interface.
+perlapio - perl's IO abstraction interface.
 
 =head1 SYNOPSIS
 
@@ -128,7 +128,7 @@ the meaning of "fileno" may not match UNIX.
 
 =item B<PerlIO_clearerr(f)>
 
-This corresponds to clearerr(), i.e. clears 'eof' and 'error'
+This corresponds to clearerr(), i.e., clears 'eof' and 'error'
 flags for the "stream".
 
 =item B<PerlIO_flush(f)>
@@ -146,7 +146,7 @@ This corresponds to fseek().
 =item B<PerlIO_getpos(f,p)>, B<PerlIO_setpos(f,p)>
 
 These correspond to fgetpos() and fsetpos(). If platform does not 
-have the stdio calls then they are implemeted in terms of PerlIO_tell()
+have the stdio calls then they are implemented in terms of PerlIO_tell()
 and PerlIO_seek().
 
 =item B<PerlIO_rewind(f)>
@@ -156,14 +156,14 @@ in terms of PerlIO_seek() at some point.
 
 =item B<PerlIO_tmpfile()>
 
-This corresponds to tmpfile(), i.e. returns an anonymous
+This corresponds to tmpfile(), i.e., returns an anonymous
 PerlIO which will automatically be deleted when closed.
 
 =back 
 
-=head2 Co-existance with stdio
+=head2 Co-existence with stdio
 
-There is outline support for co-existance of PerlIO with stdio.
+There is outline support for co-existence of PerlIO with stdio.
 Obviously if PerlIO is implemented in terms of stdio there is 
 no problem. However if perlio is implemented on top of (say) sfio
 then mechanisms must exist to create a FILE * which can be passed 
@@ -201,7 +201,7 @@ behaviour.
 =item B<PerlIO_setlinebuf(f)>
 
 This corresponds to setlinebuf(). Use is deprecated pending
-further discussion. (Perl core I<only> uses it when "dumping"
+further discussion. (Perl core uses it I<only> when "dumping"
 is has nothing to do with $| auto-flush.)
 
 =back
@@ -209,7 +209,7 @@ is has nothing to do with $| auto-flush.)
 In addition to user API above there is an "implementation" interface
 which allows perl to get at internals of PerlIO.
 The following calls correspond to the various FILE_xxx macros determined
-by Configure. This section is really only of interest to those
+by Configure. This section is really of interest to only those
 concerned with detailed perl-core behaviour or implementing a
 PerlIO mapping.
 
@@ -236,7 +236,7 @@ bytes in the buffer.
 =item B<PerlIO_fast_gets(f)>
 
 Implementation has all the interfaces required to 
-allow perls fast code to handle <FILE> mechanism.
+allow perl's fast code to handle <FILE> mechanism.
 
   PerlIO_fast_gets(f) = PerlIO_has_cntptr(f) && \ 
                         PerlIO_canset_cnt(f) && \
@@ -245,14 +245,14 @@ allow perls fast code to handle <FILE> mechanism.
 =item B<PerlIO_set_ptrcnt(f,p,c)>
 
 Set pointer into buffer, and a count of bytes still in the 
-buffer. Should only be used to set
+buffer. Should be used only to set
 pointer to within range implied by previous calls
 to C<PerlIO_get_ptr> and C<PerlIO_get_cnt>.
 
 =item B<PerlIO_set_cnt(f,c)>
 
 Obscure - set count of bytes in the buffer. Deprecated.
-Currently only used in doio.c to force count < -1 to -1.
+Currently used in only doio.c to force count < -1 to -1.
 Perhaps should be PerlIO_set_empty or similar.
 This call may actually do nothing if "count" is deduced from pointer
 and a "limit". 
